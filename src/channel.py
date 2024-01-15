@@ -1,6 +1,7 @@
-from googleapiclient.discovery import build
+import json
+import os
 
-from config import YOU_TUBE_API_KEY
+from googleapiclient.discovery import build
 
 
 class Channel:
@@ -8,10 +9,42 @@ class Channel:
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
 
-    def print_info(self) -> None:
+        self.__channel_id = channel_id
+        self.make_atribute_info()
+
+    def __repr__(self):
+        return (f"{self.channel_id} id канала\n"
+                f"{self.title} название канала\n"
+                f"{self.video_count} количество видео\n"
+                f"{self.url} url")
+
+    def get_info(self) -> None:
         """Выводит в консоль информацию о канале."""
         youtube = build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
-        channel_info = youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
-        print(channel_info)
+        return youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+
+    def print_info(self):
+        info = self.get_info()
+        print(info)
+
+    def make_atribute_info(self):
+        info = self.get_info()
+        self.title = info['items'][0]['snippet']['title']
+        self.video_count = info['items'][0]["statistics"]["videoCount"]
+        self.description = info['items'][0]['snippet']['description']
+        self.url = f"https://www.youtube.com/channel/{self.channel_id}"
+        self.subscriber_count = info['items'][0]["statistics"]["subscriberCount"]
+        self.view_count = info['items'][0]["statistics"]["subscriberCount"]
+
+    @property
+    def channel_id(self):
+        return self.__channel_id
+
+    @classmethod
+    def get_service(cls):
+        return build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
+
+    def to_json(self):
+        with open('youtube_statistics.json', 'w', encoding='utf-8') as file:
+            file.write(json.dumps(self.__dict__))
