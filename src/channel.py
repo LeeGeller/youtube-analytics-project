@@ -20,15 +20,21 @@ class Channel:
                 f"{self.url} url")
 
     def get_info(self) -> None:
-        """Выводит в консоль информацию о канале."""
+        """Получает информация по API."""
         youtube = build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
         return youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
 
     def print_info(self):
+        """
+        Выводит информацию на экран.
+        """
         info = self.get_info()
         print(info)
 
     def make_atribute_info(self):
+        """
+        Создает и заполняет атрибуты класса из полученной информации.
+        """
         info = self.get_info()
         self.title = info['items'][0]['snippet']['title']
         self.video_count = info['items'][0]["statistics"]["videoCount"]
@@ -43,8 +49,14 @@ class Channel:
 
     @classmethod
     def get_service(cls):
+        """
+        Возвращает объект для работы с YouTube API.
+        """
         return build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
 
     def to_json(self):
+        """
+        Создает файл json с информацией из атрибутов класса.
+        """
         with open('youtube_statistics.json', 'w', encoding='utf-8') as file:
             file.write(json.dumps(self.__dict__))
