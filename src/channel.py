@@ -1,3 +1,4 @@
+import json
 import os
 
 from googleapiclient.discovery import build
@@ -8,11 +9,9 @@ class Channel:
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
-        self.title = ''
-        self.video_count = ''
-        self.url = ''
-        self.all_info = None
+
+        self.__channel_id = channel_id
+        self.make_atribute_info()
 
     def __repr__(self):
         return (f"{self.channel_id} id канала\n"
@@ -20,27 +19,32 @@ class Channel:
                 f"{self.video_count} количество видео\n"
                 f"{self.url} url")
 
-    def print_info(self) -> None:
+    def get_info(self) -> None:
         """Выводит в консоль информацию о канале."""
         youtube = build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
-        self.all_info = youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+        return youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
 
-        for key, value in self.all_info.items():
-            if key == 'items':
-                for items in value:
-                    self.title = items['snippet']['title']
-                    self.video_count = items["statistics"]["videoCount"]
-                    self.url = items["kind"]
+    def print_info(self):
+        info = self.get_info()
+        print(info)
 
-        return self.all_info
+    def make_atribute_info(self):
+        info = self.get_info()
+        self.title = info['items'][0]['snippet']['title']
+        self.video_count = info['items'][0]["statistics"]["videoCount"]
+        self.description = info['items'][0]['snippet']['description']
+        self.url = f"https://www.youtube.com/channel/{self.channel_id}"
+        self.subscriber_count = info['items'][0]["statistics"]["subscriberCount"]
+        self.view_count = info['items'][0]["statistics"]["subscriberCount"]
+
+    @property
+    def channel_id(self):
+        return self.__channel_id
 
     @classmethod
     def get_service(cls):
         return build('youtube', 'v3', developerKey="AIzaSyBh6pGPuYR5rbNQDIsLLqktyXtNTJWGHWA")
 
-
-moscowpython = Channel('UC-OVMPlMA3-YCIeg4z5z23A')
-print(moscowpython.print_info())
-print(moscowpython.all_info)
-print(moscowpython.title)
-print(moscowpython.video_count)
+    def to_json(self):
+        with open('youtube_statistics.json', 'w', encoding='utf-8') as file:
+            file.write(json.dumps(self.__dict__))
