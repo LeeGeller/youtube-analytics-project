@@ -3,6 +3,8 @@ import os
 
 from googleapiclient.discovery import build
 
+KEY_API_YOUTUBE = os.getenv("KEY_API_YOUTUBE")
+
 
 class Channel:
     """Класс для ютуб-канала"""
@@ -11,7 +13,7 @@ class Channel:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
 
         self.__channel_id = channel_id
-        self.make_atribute_info()
+        self.make_attribute_info()
 
     def __repr__(self):
         return (f"{self.channel_id} id канала\n"
@@ -45,7 +47,7 @@ class Channel:
 
     def get_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        youtube = build('youtube', 'v3', developerKey=os.getenv("TEST_YOUTUBE_API"))
+        youtube = build('youtube', 'v3', developerKey=KEY_API_YOUTUBE)
         return youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
 
     def print_info(self):
@@ -55,7 +57,7 @@ class Channel:
         info = self.get_info()
         print(info)
 
-    def make_atribute_info(self):
+    def make_attribute_info(self):
         """
         Создает и заполняет атрибуты класса из полученной информации.
         """
@@ -76,7 +78,7 @@ class Channel:
         """
         Возвращает объект для работы с YouTube API.
         """
-        return build('youtube', 'v3', developerKey=os.getenv("TEST_YOUTUBE_API"))
+        return build('youtube', 'v3', developerKey=KEY_API_YOUTUBE)
 
     def to_json(self):
         """
