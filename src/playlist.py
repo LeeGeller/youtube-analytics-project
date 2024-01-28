@@ -19,17 +19,17 @@ class PlayList(Channel):
         self.url = f"https://www.youtube.com/playlist?list={self.id_playlist}"
         self.video_ids: list[str] = [video['contentDetails']['videoId'] for video in info['items']]
 
-    # def get_duration_videos(self):
-    #     youtube = self.get_service()
-    #     video_response = youtube.videos().list(part='contentDetails,statistics',
-    #                                            id=','.join(self.video_ids)
-    #                                            ).execute()
-    #
-    #     for video in video_response['items']:
-    #         # YouTube video duration is in ISO 8601 format
-    #         iso_8601_duration = video['contentDetails']['duration']
-    #         self.duration = isodate.parse_duration(iso_8601_duration)
-    #         print(self.duration)
+    def get_duration_videos(self):
+        youtube = self.get_service()
+        video_response = youtube.videos().list(part='contentDetails,statistics',
+                                               id=','.join(self.video_ids)
+                                               ).execute()
+
+        for video in video_response['items']:
+            # YouTube video duration is in ISO 8601 format
+            iso_8601_duration = video['contentDetails']['duration']
+            self.duration = isodate.parse_duration(iso_8601_duration)
+            print(self.duration)
 
 
 pl = PlayList('PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
