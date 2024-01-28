@@ -24,13 +24,13 @@ class PlayList(Channel):
 
     def get_duration_videos(self):
         youtube = self.get_service()
-        video_response = youtube.videos().list(part='contentDetails,statistics',
-                                               id=','.join(self.video_ids)
-                                               ).execute()
+        self.video_response = youtube.videos().list(part='contentDetails,statistics',
+                                                    id=','.join(self.video_ids)
+                                                    ).execute()
 
         self._total_duration = datetime.timedelta()
 
-        for video in video_response['items']:
+        for video in self.video_response['items']:
             # YouTube video duration is in ISO 8601 format
             iso_8601_duration = video['contentDetails']['duration']
             duration = isodate.parse_duration(iso_8601_duration)
@@ -40,12 +40,19 @@ class PlayList(Channel):
     def total_duration(self):
         return self._total_duration
 
+    def show_best_video(self):
+        youtube = self.get_service()
 
-pl = PlayList('PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
-print(pl.get_info())
-print(pl.title)
-print(pl.url)
-print(pl.video_ids)
-print(pl.get_duration_videos())
-print(pl.total_duration)
+        video_response = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                               id=','.join(self.video_ids)
+                                               ).execute()
+        max_likes = 0
 
+        best_video_id = ''
+
+        for info in video_response['items']:
+            if int(info['statistics']['likeCount']) > max_likes:
+                max_likes = int(info['statistics']['likeCount'])
+                best_video_id = info['id']
+
+        return f"https://www.youtube.com/watch?v={best_video_id}"
