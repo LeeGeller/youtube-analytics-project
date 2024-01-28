@@ -1,3 +1,5 @@
+import datetime
+
 import isodate
 
 from src.channel import Channel
@@ -25,11 +27,15 @@ class PlayList(Channel):
                                                id=','.join(self.video_ids)
                                                ).execute()
 
+        self.duration = []
+
         for video in video_response['items']:
             # YouTube video duration is in ISO 8601 format
             iso_8601_duration = video['contentDetails']['duration']
-            self.duration = isodate.parse_duration(iso_8601_duration)
-            print(self.duration)
+            self.duration.append(isodate.parse_duration(iso_8601_duration))
+
+
+
 
 
 pl = PlayList('PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
@@ -37,4 +43,5 @@ print(pl.get_info())
 print(pl.title)
 print(pl.url)
 print(pl.video_ids)
-print(type(pl.get_duration_videos()))
+print(pl.get_duration_videos())
+print(pl.duration)
