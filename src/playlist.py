@@ -8,6 +8,7 @@ from src.channel import Channel
 class PlayList(Channel):
     def __init__(self, id_playlist):
         self.id_playlist = id_playlist
+        self.total_duration = None
         self.make_attribute_info()
 
     def get_info(self) -> None:
@@ -27,15 +28,16 @@ class PlayList(Channel):
                                                id=','.join(self.video_ids)
                                                ).execute()
 
-        self.duration = []
+        self.total_duration = datetime.timedelta()
 
         for video in video_response['items']:
             # YouTube video duration is in ISO 8601 format
             iso_8601_duration = video['contentDetails']['duration']
-            self.duration.append(isodate.parse_duration(iso_8601_duration))
+            duration = isodate.parse_duration(iso_8601_duration)
+            self.total_duration += duration
 
-
-
+    # @property
+    # def total_duration(self):
 
 
 pl = PlayList('PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
@@ -44,4 +46,5 @@ print(pl.title)
 print(pl.url)
 print(pl.video_ids)
 print(pl.get_duration_videos())
-print(pl.duration)
+print(pl.total_duration)
+
